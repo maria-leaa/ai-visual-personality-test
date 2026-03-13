@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Visual MBTI Personality Test</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --bg: #f8fafc;
+            --text: #1e293b;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 750px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            margin: 0;
+            color: var(--primary);
+            font-size: 2.2rem;
+        }
+
+        p.subtitle {
+            color: #64748b;
+            margin-top: 10px;
+            font-size: 1.1rem;
+        }
+
+        .question-block {
+            margin-bottom: 40px;
+            border-bottom: 1px solid #f1f5f9;
+            padding-bottom: 30px;
+        }
+
+        .question-text {
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            display: block;
+            color: #334155;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .option-card {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .option-card input {
+            display: none;
+        }
+
+        .option-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 4px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .option-card span {
+            display: block;
+            text-align: center;
+            font-size: 0.95rem;
+            margin-top: 8px;
+            font-weight: 500;
+            color: #475569;
+        }
+
+        .option-card input:checked+img {
+            border-color: var(--primary);
+            transform: translateY(-5px);
+            box-shadow: 0 12px 20px -5px rgba(99, 102, 241, 0.3);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            border-top: 2px solid #f1f5f9;
+            padding-top: 30px;
+        }
+
+        label.email-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        input[type="email"] {
+            width: 100%;
+            max-width: 450px;
+            padding: 14px 18px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            margin-bottom: 25px;
+            transition: 0.2s;
+        }
+
+        input[type="email"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 18px 36px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 4px 6px rgba(99, 102, 241, 0.2);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        button:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #resultBox {
+            margin-top: 40px;
+            padding: 30px;
+            border-radius: 15px;
+            display: none;
+            text-align: center;
+            background: #eef2ff;
+            border: 2px solid #c7d2fe;
+        }
+
+        #resultBox h2 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin-top: 0;
+        }
+
+        #resultBox p {
+            font-size: 1.1rem;
+            color: #3730a3;
+        }
+
+        .loader {
+            display: none;
+            margin: 20px auto;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <header>
+            <h1>AI Visual Personality Test</h1>
+            <p class="subtitle">Select the images that resonate most with you to discover your MBTI.</p>
+        </header>
+
+        <form id="quizForm">
+            <div class="question-block">
+                <label class="question-text">1. How do you prefer to recharge your energy?</label>
+                <div class="options-grid">
+                    <label class="option-card">
+                        <input type="radio" name="q1" value="Extraversion" required>
+                        <img src="https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=400" alt="Party">
+                        <span>In the company of others</span>
+                    </label>
+                    <label class="option-card">
+                        <input type="radio" name="q1" value="Introversion">
+                        <img src="https://images.unsplash.com/photo-1516979187457-637abb4f9353?auto=format&fit=crop&w=400"
+                            alt="Quiet">
+                        <span>In quiet solitude</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="question-block">
+                <label class="question-text">2. Your ideal social setting is...</label>
+                <div class="options-grid">
+                    <label class="option-card">
+                        <input type="radio" name="q2" value="Extraversion" required>
+                        <img src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=400"
+                            alt="Festival">
+                        <span>A lively event or festival</span>
+                    </label>
+                    <label class="option-card">
+                        <input type="radio" name="q2" value="Introversion">
+                        <img src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=400"
+                            alt="Coffee">
+                        <span>A small coffee with a close friend</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="question-block">
+                <label class="question-text">3. When looking at a forest, you see...</label>
+                <div class="options-grid">
+                    <label class="option-card">
+                        <input type="radio" name="q3" value="Sensing" required>
+                        <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400" alt="Trees">
+                        <span>The details: trees, leaves, and path</span>
+                    </label>
+                    <label class="option-card">
+                        <input type="radio" name="q3" value="Intuition">
+                        <img src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=400" alt="Mist">
+                        <span>The mood: mystery and possibilities</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="question-block">
+                <label class="question-text">4. Which type of art captures your attention?</label>
+                <div class="options-grid">
+                    <label class="option-card">
+                        <input type="radio" name="q4" value="Sensing" required>
+                        <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400" alt="Realism">
+                        <span>Realistic and detailed photography</span>
+                    </label>
+                    <label class="option-card">
+                        <input type="radio" name="q4" value="Intuition">
+                        <img src="https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=400" alt="Abstract">
+                        <span>Abstract and symbolic paintings</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="question-block">
+                <label class="question-text">5. How do you make tough decisions?</label>
+                <div class="options-grid">
+                    <label class="option-card">
+                        <input type="radio" name="q5" value="Thinking" required>
+                        <img src="https://images.unsplash.com/photo-1507413245164-6160d8298b31?w=400" alt="Lab">
+                        <span>Objective logic and facts</span>
+                    </label>
+                    <label class="option-card">
+                        <input type="radio" name="q5" value="Feeling">
+                        <img src="https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=400" alt="Heart">
+                        <span>How it affects people and values</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="question-block">
+                <label class="question-text">6. When helping a friend, you offer...</label>
+                <div class="options-grid">
+                    <label class="option-card">
+                        <input type="radio" name="q6" value="Thinking" required>
+                        <img src="https://images.unsplash.com/photo-1553877522-43269d4ea984?auto=format&fit=crop&w=400"
+                            alt="Logic">
+                        <span>Practical, direct solutions</span>
+                    </label>
+                    <label class="option-card">
+                        <input type="radio" name="q6" value="Feeling">
+                        <img src="https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&w=400"
+                            alt="Empathy">
+                        <span>Emotional support and empathy</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="question-block">
+                <label class="question-text">7. Your workspace usually looks like...</label>
+                <div class="options-grid">
+                    <label class="option-card">
+                        <input type="radio" name="q7" value="Judging" required>
+                        <img src="https://images.unsplash.com/photo-1497032628192-86f99bcd76bc?auto=format&fit=crop&w=400"
+                            alt="Organized">
+                        <span>Highly organized and planned</span>
+                    </label>
+                    <label class="option-card">
+                        <input type="radio" name="q7" value="Perceiving">
+                        <img src="https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=400"
+                            alt="Creative">
+                        <span>Creative, flexible, and spontaneous</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="question-block">
+                <label class="question-text">8. How do you approach a new project?</label>
+                <div class="options-grid">
+                    <label class="option-card">
+                        <input type="radio" name="q8" value="Judging" required>
+                        <img src="https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=400" alt="Planner">
+                        <span>By creating a clear schedule</span>
+                    </label>
+                    <label class="option-card">
+                        <input type="radio" name="q8" value="Perceiving">
+                        <img src="https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=400" alt="Draft">
+                        <span>By diving in and seeing where it goes</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="footer">
+                <label class="email-label">Final Step: Where should we send your results?</label>
+                <input type="email" id="email" placeholder="name@example.com" required>
+                <br>
+                <button type="submit" id="submitBtn">Get AI Results Now</button>
+                <div class="loader" id="loader"></div>
+                <div id="resultBox"></div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const form = document.getElementById('quizForm');
+        const resultBox = document.getElementById('resultBox');
+        const submitBtn = document.getElementById('submitBtn');
+        const loader = document.getElementById('loader');
+
+        const WEBHOOK_URL = 'https://marialeaa.app.n8n.cloud/webhook/mbti-quiz';
+
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Analyzing your personality...";
+            loader.style.display = "block";
+            resultBox.style.display = "none";
+
+            const formData = new FormData(form);
+            const payload = {
+                email: document.getElementById('email').value,
+                answers: Object.fromEntries(formData)
+            };
+
+            try {
+                const response = await fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) throw new Error('n8n response failed');
+
+                const data = await response.json();
+                console.log("Response from AI:", data);
+
+                let mbti = "Result Ready!";
+                let description = "Please check your email for the detailed analysis.";
+
+                if (data.output && data.output.mbti) {
+                    mbti = data.output.mbti;
+                    description = data.output.description;
+                } else if (data.mbti) {
+                    mbti = data.mbti;
+                    description = data.description;
+                } else if (typeof data === 'string') {
+                    mbti = "Analysis Complete";
+                    description = data;
+                }
+
+                resultBox.style.display = "block";
+                resultBox.innerHTML = `
+                <h2>${mbti}</h2>
+                <p>${description}</p>
+                <p><small>✓ A copy of this result has been emailed to ${payload.email}</small></p>
+            `;
+                resultBox.scrollIntoView({ behavior: 'smooth' });
+
+            } catch (error) {
+                alert("Error: Ensure your n8n workflow is 'Active' and includes a 'Respond to Webhook' node.");
+                console.error(error);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Get AI Results Now";
+                loader.style.display = "none";
+            }
+        };
+    </script>
+
+</body>
+
+</html>
