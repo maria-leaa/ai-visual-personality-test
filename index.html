@@ -362,6 +362,63 @@
         const submitBtn = document.getElementById('submitBtn');
         const loader = document.getElementById('loader');
 
+        // CHANGE THIS to the URL Supabase gives you after deploying
+        const WEBHOOK_URL = 'https://nfewpfkzlinuiaucxube.supabase.co/functions/v1/super-endpoint';
+
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Analyzing your personality...";
+            loader.style.display = "block";
+            resultBox.style.display = "none";
+
+            const formData = new FormData(form);
+            const payload = {
+                answers: Object.fromEntries(formData)
+            };
+
+            try {
+                const response = await fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                        // Notice: We do NOT send "Authorization" here because we turned off JWT
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Server error');
+                }
+
+                const data = await response.json();
+
+                resultBox.style.display = "block";
+                resultBox.innerHTML = `
+                <h2 style="color: #6366f1;">Your Type: ${data.mbti}</h2>
+                <p>${data.description}</p>
+            `;
+                resultBox.scrollIntoView({ behavior: 'smooth' });
+
+            } catch (error) {
+                console.error("DETAILED ERROR:", error);
+                alert("Error: " + error.message);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Get AI Results Now";
+                loader.style.display = "none";
+            }
+        };
+    </script>
+
+    <!-- <script>
+        const form = document.getElementById('quizForm');
+        const resultBox = document.getElementById('resultBox');
+        const submitBtn = document.getElementById('submitBtn');
+        const loader = document.getElementById('loader');
+
         const WEBHOOK_URL = 'https://marialeaa.app.n8n.cloud/webhook/mbti-quiz';
 
         form.onsubmit = async (e) => {
@@ -421,7 +478,7 @@
                 loader.style.display = "none";
             }
         };
-    </script>
+    </script> -->
 
 </body>
 
