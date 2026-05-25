@@ -347,7 +347,7 @@
 
             <div class="footer">
                 <label class="email-label">Final Step: Where should we send your results?</label>
-                <input type="email" id="email" placeholder="name@example.com" required>
+                <input type="email" id="email" name="email" placeholder="name@example.com" required>
                 <br>
                 <button type="submit" id="submitBtn">Get AI Results Now</button>
                 <div class="loader" id="loader"></div>
@@ -374,36 +374,32 @@
             resultBox.style.display = "none";
 
             const formData = new FormData(form);
+
             const payload = {
+                email: document.getElementById('email').value,
                 answers: Object.fromEntries(formData)
             };
 
             try {
                 const response = await fetch(WEBHOOK_URL, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                        // Notice: We do NOT send "Authorization" here because we turned off JWT
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
 
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || 'Server error');
-                }
+                if (!response.ok) throw new Error('Analysis failed');
 
                 const data = await response.json();
 
                 resultBox.style.display = "block";
                 resultBox.innerHTML = `
-                <h2 style="color: #6366f1;">Your Type: ${data.mbti}</h2>
-                <p>${data.description}</p>
-            `;
+            <h2 style="color: #6366f1;">Your Type: ${data.mbti}</h2>
+            <p>${data.description}</p>
+            <p style="color: green; font-weight: bold;">✓ Check your email for the detailed report!</p>
+        `;
                 resultBox.scrollIntoView({ behavior: 'smooth' });
 
             } catch (error) {
-                console.error("DETAILED ERROR:", error);
                 alert("Error: " + error.message);
             } finally {
                 submitBtn.disabled = false;
@@ -413,6 +409,7 @@
         };
     </script>
 
+    <!-- Old n8n Webhook version (keep for reference, but remember to update the URL and response handling if you switch back to n8n) -->
     <!-- <script>
         const form = document.getElementById('quizForm');
         const resultBox = document.getElementById('resultBox');
